@@ -188,6 +188,18 @@ header { text-align: center; margin-bottom: 4px; }
 }
 .stat-tab.active { background: #e94560; color: #fff; }
 
+.stats-period {
+  display: flex; justify-content: space-between; align-items: center;
+  margin: -6px 0 12px; padding: 0 4px;
+}
+.stats-period button {
+  width: 44px; height: 36px; border: none; background: none;
+  color: #e94560; font-size: 28px; line-height: 1;
+  font-family: inherit; -webkit-appearance: none;
+}
+.stats-period button:disabled { opacity: .3; }
+#periodLabel { font-size: 14px; color: #eee; font-weight: 600; }
+
 .stats-card { padding: 20px; margin-bottom: 14px; }
 .stats-summary-head {
   text-align: center; font-size: 14px; color: #e94560; font-weight: 600;
