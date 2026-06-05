@@ -14,28 +14,26 @@
 </head>
 <body>
 
-  <!-- 三个页面，用 display 切换 -->
+  <!-- ====== 记账页 ====== -->
   <div id="page-track" class="page active">
 
-    <!-- 今日汇总 -->
     <div class="card summary">
       <div class="summary-label">今日收入</div>
       <div class="summary-amount" id="todayTotal">¥0.00</div>
       <div class="summary-count" id="todayCount">共 0 笔</div>
     </div>
 
-    <!-- 输入区 -->
     <div class="card input-area">
       <div class="amount-row">
         <span class="yuan">¥</span>
         <input type="text" id="amountInput" placeholder="0.00" inputmode="decimal" autocomplete="off">
       </div>
       <input type="text" id="noteInput" placeholder="备注（选填）" maxlength="50" autocomplete="off">
+      <div id="noteTemplates" class="note-templates"></div>
       <button id="addBtn">记一笔</button>
       <div class="chips" id="chips"></div>
     </div>
 
-    <!-- 记录列表 -->
     <div class="history-bar">
       <button id="prevDay">‹</button>
       <span id="dateLabel">今天</span>
@@ -46,18 +44,34 @@
 
   <!-- ====== 统计页 ====== -->
   <div id="page-stats" class="page">
+    <!-- 分类筛选 -->
+    <div class="category-filter" id="categoryFilter">
+      <button class="cat-btn active" data-cat="all">全部</button>
+      <button class="cat-btn" data-cat="GPT">GPT</button>
+      <button class="cat-btn" data-cat="抢车">抢车</button>
+      <button class="cat-btn" data-cat="基金">基金</button>
+      <button class="cat-btn" data-cat="闲置">闲置</button>
+    </div>
+
+    <!-- 时间范围 -->
     <div class="stats-tabs">
       <button class="stat-tab active" data-mode="week">本周</button>
       <button class="stat-tab" data-mode="month">本月</button>
       <button class="stat-tab" data-mode="year">全年</button>
     </div>
+
+    <!-- 汇总数字 -->
     <div class="card stats-card">
+      <div class="stats-summary-head" id="statsTitle">全部收入</div>
       <div class="stats-summary-row">
         <div><span class="stats-num" id="statsTotal">¥0</span><span class="stats-label">总收入</span></div>
         <div><span class="stats-num" id="statsAvg">¥0</span><span class="stats-label">日均</span></div>
         <div><span class="stats-num" id="statsMax">¥0</span><span class="stats-label">最高</span></div>
       </div>
+      <div class="stats-extra" id="statsCount">共 0 笔</div>
     </div>
+
+    <!-- 图表 -->
     <div class="card chart-card">
       <canvas id="chart" style="width:100%;height:100%"></canvas>
     </div>
@@ -75,7 +89,6 @@
     </button>
   </nav>
 
-  <!-- Toast -->
   <div id="toast"></div>
 
   <script>
