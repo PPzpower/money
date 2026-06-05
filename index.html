@@ -29,6 +29,7 @@
         <span class="yuan">¥</span>
         <input type="text" id="amountInput" placeholder="0.00" inputmode="decimal" autocomplete="off">
       </div>
+      <div id="entryCategory" class="entry-category"></div>
       <input type="text" id="noteInput" placeholder="备注（选填）" maxlength="50" autocomplete="off">
       <div id="noteTemplates" class="note-templates"></div>
       <button id="addBtn">记一笔</button>
@@ -40,6 +41,16 @@
       <span id="dateLabel">今天</span>
       <button id="nextDay" disabled style="opacity:0.3">›</button>
     </div>
+
+    <div class="card calendar-card">
+      <div class="calendar-head">
+        <button id="prevCalendarMonth" aria-label="上一月">‹</button>
+        <span id="calendarLabel">本月</span>
+        <button id="nextCalendarMonth" aria-label="下一月">›</button>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </div>
+
     <div id="entryList" class="entry-list-scroll"></div>
   </div>
 
@@ -52,6 +63,7 @@
       <button class="cat-btn" data-cat="抢车">抢车</button>
       <button class="cat-btn" data-cat="基金">基金</button>
       <button class="cat-btn" data-cat="闲置">闲置</button>
+      <button class="cat-btn" data-cat="未分类">未分类</button>
     </div>
 
     <!-- 时间范围 -->
@@ -81,6 +93,35 @@
     <!-- 图表 -->
     <div class="card chart-card">
       <canvas id="chart" style="width:100%;height:100%"></canvas>
+    </div>
+
+    <div class="card share-card">
+      <div class="share-head">分类占比</div>
+      <div id="categoryShareList" class="share-list"></div>
+    </div>
+
+    <div class="data-actions">
+      <button id="exportBtn">导出数据</button>
+      <button id="importBtn">导入数据</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+  </div>
+
+  <div id="editModal" class="modal hidden">
+    <div class="modal-panel">
+      <div class="modal-head">
+        <span>编辑记录</span>
+        <button id="editClose" aria-label="关闭">×</button>
+      </div>
+      <input type="date" id="editDate">
+      <div id="editCategory" class="entry-category"></div>
+      <input type="text" id="editAmount" placeholder="金额" inputmode="decimal" autocomplete="off">
+      <input type="text" id="editNote" placeholder="备注（选填）" maxlength="50" autocomplete="off">
+      <div class="modal-actions">
+        <button id="editDelete" class="danger">删除</button>
+        <button id="editCancel">取消</button>
+        <button id="editSave" class="primary">保存</button>
+      </div>
     </div>
   </div>
 

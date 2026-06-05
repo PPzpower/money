@@ -75,6 +75,19 @@ header { text-align: center; margin-bottom: 4px; }
 .sign-toggle.active { background: #e94560; border-color: #e94560; color: #fff; }
 .yuan { font-size: 30px; font-weight: 700; color: #e94560; }
 
+.entry-category {
+  display: flex; gap: 6px; overflow-x: auto;
+  padding-bottom: 4px; margin: 4px 0 10px;
+  -webkit-overflow-scrolling: touch;
+}
+.entry-cat-btn {
+  padding: 7px 12px; border-radius: 16px; border: 1px solid #2a2a4a;
+  background: #0f0f1a; color: #888; font-size: 12px; font-weight: 700;
+  font-family: inherit; -webkit-appearance: none; white-space: nowrap;
+  flex-shrink: 0;
+}
+.entry-cat-btn.active { background: #e94560; color: #fff; border-color: #e94560; }
+
 #amountInput {
   flex: 1; background: none; border: none;
   border-bottom: 2px solid #2a2a4a;
@@ -126,6 +139,42 @@ header { text-align: center; margin-bottom: 4px; }
 }
 #dateLabel { font-size: 15px; color: #eee; font-weight: 600; }
 
+.calendar-card { padding: 12px; margin-bottom: 10px; flex-shrink: 0; }
+.calendar-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.calendar-head button {
+  width: 36px; height: 30px; border: none; background: none;
+  color: #e94560; font-size: 24px; line-height: 1;
+  font-family: inherit; -webkit-appearance: none;
+}
+#calendarLabel { font-size: 13px; color: #eee; font-weight: 700; }
+.calendar-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.calendar-weekday {
+  text-align: center; font-size: 10px; color: #555; padding-bottom: 2px;
+}
+.calendar-day {
+  min-height: 38px; border-radius: 8px; border: 1px solid #242442;
+  background: #0f0f1a; color: #777;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; font-family: inherit; -webkit-appearance: none;
+  overflow: hidden;
+}
+.calendar-day.today { border-color: #e94560; }
+.calendar-day.active { background: rgba(233,69,96,.18); border-color: #e94560; color: #fff; }
+.calendar-day.empty { opacity: 0; pointer-events: none; }
+.calendar-day-num { font-size: 12px; font-weight: 700; line-height: 1; }
+.calendar-day-amount {
+  max-width: 100%; padding: 0 2px; font-size: 9px; color: #00d2a0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.calendar-day-amount.negative { color: #e94560; }
+.calendar-day-amount.neutral { color: #777; }
+
 .entry-list-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .empty { text-align: center; color: #555; padding: 30px 10px; }
 
@@ -167,6 +216,7 @@ header { text-align: center; margin-bottom: 4px; }
 .entry-body { flex: 1; min-width: 0; }
 .entry-note { font-size: 14px; color: #ddd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .entry-time { font-size: 11px; color: #666; margin-top: 2px; }
+.entry-cat { font-size: 11px; color: #e94560; margin-right: 6px; }
 .entry-right { display: flex; align-items: center; gap: 8px; }
 .entry-amount { font-size: 17px; font-weight: 700; color: #00d2a0; white-space: nowrap; }
 .entry-amount.negative { color: #e94560; }
@@ -230,6 +280,31 @@ header { text-align: center; margin-bottom: 4px; }
 
 .chart-card { padding: 16px; height: 280px; margin-bottom: 20px; }
 
+.share-card { padding: 16px; margin-bottom: 14px; }
+.share-head {
+  text-align: center; font-size: 14px; color: #e94560;
+  font-weight: 700; margin-bottom: 12px;
+}
+.share-row {
+  display: grid; grid-template-columns: 52px 1fr 72px;
+  gap: 8px; align-items: center; margin-bottom: 10px;
+}
+.share-name { font-size: 12px; color: #ddd; font-weight: 700; }
+.share-track { height: 8px; border-radius: 999px; background: #0f0f1a; overflow: hidden; }
+.share-fill { height: 100%; border-radius: 999px; background: #00d2a0; }
+.share-value { font-size: 12px; color: #888; text-align: right; white-space: nowrap; }
+.share-empty { text-align: center; color: #555; font-size: 13px; padding: 14px 0; }
+
+.data-actions {
+  display: flex; gap: 8px; margin-bottom: 20px;
+}
+.data-actions button {
+  flex: 1; padding: 11px 0; border-radius: 14px;
+  border: 1px solid #2a2a4a; background: #1a1a2e;
+  color: #eee; font-size: 13px; font-weight: 700;
+  font-family: inherit; -webkit-appearance: none;
+}
+
 /* ====== 底部导航 ====== */
 nav {
   display: flex; justify-content: space-around; align-items: center;
@@ -267,6 +342,40 @@ nav {
   transition: all .3s; border: 1px solid #3a3a5a; z-index: 99;
 }
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.modal {
+  position: fixed; inset: 0; background: rgba(15,15,26,.72);
+  display: flex; align-items: flex-end; justify-content: center;
+  z-index: 120; padding: 16px;
+}
+.modal.hidden { display: none; }
+.modal-panel {
+  width: 100%; max-width: 448px; background: #1a1a2e;
+  border: 1px solid #2a2a4a; border-radius: 16px;
+  padding: 16px; box-shadow: 0 -12px 36px rgba(0,0,0,.32);
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px; color: #eee; font-weight: 800;
+}
+.modal-head button {
+  width: 32px; height: 32px; border: none; border-radius: 50%;
+  background: #0f0f1a; color: #888; font-size: 22px;
+  font-family: inherit; -webkit-appearance: none;
+}
+#editAmount, #editNote, #editDate {
+  width: 100%; background: #0f0f1a; border: 1px solid #2a2a4a;
+  border-radius: 10px; font-size: 15px; color: #eee;
+  padding: 11px 12px; outline: none; margin-bottom: 10px; font-family: inherit;
+}
+.modal-actions { display: flex; gap: 8px; margin-top: 4px; }
+.modal-actions button {
+  flex: 1; padding: 12px 0; border: none; border-radius: 12px;
+  font-size: 14px; font-weight: 800; font-family: inherit; -webkit-appearance: none;
+}
+.modal-actions .primary { background: #e94560; color: #fff; }
+.modal-actions .danger { background: #0f0f1a; color: #e94560; border: 1px solid #3a3a5a; }
+#editCancel { background: #2a2a4a; color: #ddd; }
 
 /* 去掉数字框箭头 */
 input[type="number"]::-webkit-inner-spin-button,
