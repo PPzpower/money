@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <!-- Apple 主屏幕 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="副业记账">
@@ -13,60 +12,74 @@
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body ontouchmove="event.preventDefault()">
 
-  <!-- 顶部 -->
-  <header>
-    <h1>💰 副业记账</h1>
-    <p class="tagline">每一笔努力，都值得被记住</p>
-  </header>
+  <!-- 三个页面，用 display 切换 -->
+  <div id="page-track" class="page active">
 
-  <!-- 今日汇总 -->
-  <div class="card summary">
-    <div class="summary-label">今日收入</div>
-    <div class="summary-amount" id="todayTotal">¥0.00</div>
-    <div class="summary-count" id="todayCount">共 0 笔</div>
-  </div>
-
-  <!-- 记账区域 -->
-  <div class="card input-area">
-    <div class="amount-row">
-      <span class="yuan">¥</span>
-      <input type="number" id="amountInput" placeholder="0.00" inputmode="decimal" step="0.01" min="0.01">
+    <!-- 今日汇总 -->
+    <div class="card summary">
+      <div class="summary-label">今日收入</div>
+      <div class="summary-amount" id="todayTotal">¥0.00</div>
+      <div class="summary-count" id="todayCount">共 0 笔</div>
     </div>
-    <input type="text" id="noteInput" placeholder="备注（选填）" maxlength="50">
-    <button id="addBtn">记一笔</button>
 
-    <!-- 快捷金额 -->
-    <div class="chips">
-      <button class="chip" data-amount="10">¥10</button>
-      <button class="chip" data-amount="50">¥50</button>
-      <button class="chip" data-amount="100">¥100</button>
-      <button class="chip" data-amount="200">¥200</button>
-      <button class="chip" data-amount="500">¥500</button>
-      <button class="chip" data-amount="1000">¥1000</button>
+    <!-- 输入区 -->
+    <div class="card input-area">
+      <div class="amount-row">
+        <span class="yuan">¥</span>
+        <input type="text" id="amountInput" placeholder="0.00" inputmode="decimal" autocomplete="off">
+      </div>
+      <input type="text" id="noteInput" placeholder="备注（选填）" maxlength="50" autocomplete="off">
+      <button id="addBtn">记一笔</button>
+      <div class="chips" id="chips"></div>
     </div>
-  </div>
 
-  <!-- 记录列表 -->
-  <div class="history">
+    <!-- 记录列表 -->
     <div class="history-bar">
-      <button id="prevDay">‹ 前一天</button>
+      <button id="prevDay">‹</button>
       <span id="dateLabel">今天</span>
-      <button id="nextDay">后一天 ›</button>
+      <button id="nextDay">›</button>
     </div>
-    <ul id="entryList">
-      <li class="empty">暂无记录，快去记一笔吧 ✍️</li>
-    </ul>
+    <div id="entryList" class="entry-list"></div>
   </div>
+
+  <!-- ====== 统计页 ====== -->
+  <div id="page-stats" class="page">
+    <div class="stats-tabs">
+      <button class="stat-tab active" data-mode="week">本周</button>
+      <button class="stat-tab" data-mode="month">本月</button>
+      <button class="stat-tab" data-mode="year">全年</button>
+    </div>
+    <div class="card stats-card">
+      <div class="stats-summary-row">
+        <div><span class="stats-num" id="statsTotal">¥0</span><span class="stats-label">总收入</span></div>
+        <div><span class="stats-num" id="statsAvg">¥0</span><span class="stats-label">日均</span></div>
+        <div><span class="stats-num" id="statsMax">¥0</span><span class="stats-label">最高</span></div>
+      </div>
+    </div>
+    <div class="card chart-card">
+      <canvas id="chart" style="width:100%;height:100%"></canvas>
+    </div>
+  </div>
+
+  <!-- ====== 底部导航 ====== -->
+  <nav id="bottomNav">
+    <button class="nav-btn active" data-page="page-track">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+      <span>记账</span>
+    </button>
+    <button class="nav-btn" data-page="page-stats">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>统计</span>
+    </button>
+  </nav>
 
   <!-- Toast -->
   <div id="toast"></div>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
-    }
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
   </script>
   <script src="app.js"></script>
 </body>
