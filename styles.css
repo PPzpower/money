@@ -57,6 +57,8 @@ header { text-align: center; margin-bottom: 4px; }
 }
 .summary-label { font-size: 11px; color: #888; letter-spacing: 3px; text-transform: uppercase; }
 .summary-amount { font-size: 44px; font-weight: 800; color: #00d2a0; margin: 6px 0; }
+.summary-amount.negative { color: #e94560; }
+.summary-amount.neutral { color: #888; }
 .summary-count { font-size: 12px; color: #666; }
 
 /* ====== 输入区 ====== */
@@ -159,6 +161,7 @@ header { text-align: center; margin-bottom: 4px; }
 .entry-time { font-size: 11px; color: #666; margin-top: 2px; }
 .entry-right { display: flex; align-items: center; gap: 8px; }
 .entry-amount { font-size: 17px; font-weight: 700; color: #00d2a0; white-space: nowrap; }
+.entry-amount.negative { color: #e94560; }
 .entry-del { background: none; border: none; color: #555; font-size: 18px; padding: 4px 6px; -webkit-appearance: none; }
 .entry-del:active { color: #e94560; }
 
@@ -210,6 +213,8 @@ header { text-align: center; margin-bottom: 4px; }
 }
 .stats-summary-row div { display: flex; flex-direction: column; }
 .stats-num { font-size: 22px; font-weight: 700; color: #00d2a0; }
+.stats-num.negative { color: #e94560; }
+.stats-num.neutral { color: #888; }
 .stats-label { font-size: 11px; color: #666; margin-top: 4px; }
 .stats-extra {
   text-align: center; font-size: 12px; color: #666; margin-top: 12px;

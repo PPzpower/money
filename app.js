@@ -39,12 +39,30 @@ function fmtYMD(d) { return `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}
 function fmtTime(ts) { const d=new Date(ts); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 function genId() { return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-function fmtMoney(n) { return '¥' + Number(n || 0).toFixed(2); }
-function fmtChartMoney(n) {
+function fmtMoney(n) {
   const v = Number(n || 0);
+  return (v < 0 ? '-' : '') + '¥' + Math.abs(v).toFixed(2);
+}
+function fmtChartMoney(n) {
+  const v = Math.abs(Number(n || 0));
   if (Math.abs(v) >= 10000) return (v / 10000).toFixed(v % 10000 === 0 ? 0 : 1) + '万';
   if (Math.abs(v) >= 1000) return String(Math.round(v));
   return Number.isInteger(v) ? String(v) : v.toFixed(2).replace(/\.?0+$/,'');
+}
+function fmtChartAmount(n) {
+  const v = Number(n || 0);
+  return (v < 0 ? '-' : '') + '¥' + fmtChartMoney(v);
+}
+function toneClass(v) {
+  if (v < 0) return 'negative';
+  if (v === 0) return 'neutral';
+  return '';
+}
+function setMoneyText(id, value) {
+  const el = $(id);
+  el.textContent = fmtMoney(value);
+  el.classList.toggle('negative', value < 0);
+  el.classList.toggle('neutral', value === 0);
 }
 
 // ====== 状态 ======
@@ -60,7 +78,7 @@ let swipedEntry = null;
 function normalizeEntry(e) {
   if (!e || typeof e !== 'object') return null;
   const amount = Number(e.amount);
-  if (!Number.isFinite(amount) || amount <= 0) return null;
+  if (!Number.isFinite(amount) || amount === 0) return null;
 
   let date = parseLocalDate(e.date) ? e.date : '';
   const timestamp = Number(e.timestamp);
@@ -89,9 +107,9 @@ function renderTrack() {
   const day = entries.filter(e=>e.date===filterDate).sort((a,b)=>b.timestamp-a.timestamp);
   const today=todayStr(), yest=dStr(addDays(parseLocalDate(today), -1));
   // 顶部汇总卡片标题跟随实际日期
-  const todayLabel = filterDate===today?'今日收入':filterDate===yest?'昨日收入':filterDate+' 收入';
+  const todayLabel = filterDate===today?'今日收益':filterDate===yest?'昨日收益':filterDate+' 收益';
   $('summaryLabel').textContent = todayLabel;
-  $('todayTotal').textContent = '¥'+day.reduce((s,e)=>s+e.amount,0).toFixed(2);
+  setMoneyText('todayTotal', day.reduce((s,e)=>s+e.amount,0));
   $('todayCount').textContent = '共 '+day.length+' 笔';
   $('dateLabel').textContent = filterDate===today?'今天':filterDate===yest?'昨天':filterDate;
   // 点击日期标签回到今天
@@ -113,7 +131,7 @@ function renderTrack() {
           <div class="entry-time">${fmtTime(e.timestamp)}</div>
         </div>
         <div class="entry-right">
-          <span class="entry-amount">¥${e.amount.toFixed(2)}</span>
+          <span class="entry-amount ${toneClass(e.amount)}">${fmtMoney(e.amount)}</span>
         </div>
       </div>
     </div>`
@@ -146,7 +164,7 @@ function closeSwipe(el) { el.classList.remove('swiped'); el.querySelector('.entr
 function add() {
   const rawAmount = $('amountInput').value.trim();
   const v = Number(rawAmount);
-  if (isNaN(v)||v<=0) { toast('请输入有效金额'); return; }
+  if (!Number.isFinite(v)||v===0) { toast('请输入非 0 金额'); return; }
   const note = $('noteInput').value.trim();
   entries.push({ id:genId(), amount:Math.round(v*100)/100, note, date:filterDate, timestamp:Date.now() });
   save();
@@ -292,16 +310,18 @@ function renderStats() {
   const total = data.reduce((a,b)=>a+b,0);
   const ct = filtered.length;
   const avg = total / daysInclusive(range.start, range.end);
-  const max = Math.max(...data,0);
+  const nonZeroData = data.filter(v=>v!==0);
+  const max = nonZeroData.length ? Math.max(...nonZeroData) : 0;
+  const min = nonZeroData.length ? Math.min(...nonZeroData) : 0;
   const catName = statCategory==='all'?'全部':statCategory;
 
   $('periodLabel').textContent = range.label;
   $('prevPeriod').disabled = !range.canPrev;
   $('nextPeriod').disabled = !range.canNext;
-  $('statsTitle').textContent = `${catName}收入 · ${range.label}`;
-  $('statsTotal').textContent = fmtMoney(total);
-  $('statsAvg').textContent = fmtMoney(avg);
-  $('statsMax').textContent = fmtMoney(max);
+  $('statsTitle').textContent = `${catName}收益 · ${range.label}`;
+  setMoneyText('statsTotal', total);
+  setMoneyText('statsAvg', avg);
+  setMoneyText('statsMax', max);
   $('statsCount').textContent = `共 ${ct} 笔`;
 
   // 画图
@@ -326,13 +346,19 @@ function renderStats() {
   // Y轴刻度标签 + 网格线
   c.strokeStyle = '#1a1a3a'; c.lineWidth = 0.5;
   c.fillStyle = '#555'; c.font = '11px -apple-system, "PingFang SC", sans-serif'; c.textAlign = 'right';
-  const maxVal = max || 1;
+  const domainMax = Math.max(max, 0);
+  const domainMin = Math.min(min, 0);
+  const domainSpan = domainMax - domainMin || 1;
+  const valueToY = v => pyTop + (domainMax - v) / domainSpan * gh;
+  const zeroY = valueToY(0);
   for (let i = 0; i <= 4; i++) {
     const y = pyTop + gh * i / 4;
-    const val = maxVal * (4 - i) / 4;
+    const val = domainMax - domainSpan * i / 4;
     c.beginPath(); c.moveTo(px, y); c.lineTo(px + gw, y); c.stroke();
-    c.fillText('¥' + fmtChartMoney(val), px - 6, y + 4);
+    c.fillText(fmtChartAmount(val), px - 6, y + 4);
   }
+  c.strokeStyle = '#3a3a5a'; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(px, zeroY); c.lineTo(px + gw, zeroY); c.stroke();
 
   // 柱子
   const barW = Math.max(4, Math.min(26, gw / range.buckets.length * 0.52));
@@ -341,38 +367,55 @@ function renderStats() {
     all: '#00d2a0', GPT: '#10b981', '抢车': '#3b82f6', '基金': '#f59e0b', '闲置': '#8b5cf6'
   };
   const col = categoryColors[statCategory] || '#00d2a0';
+  const lossCol = '#e94560';
 
   data.forEach((v, i) => {
     const x = px + i * gap + (gap - barW) / 2;
     const centerX = px + i * gap + gap / 2;
 
-    if (v > 0) {
-      const bh = Math.max(2, v / maxVal * gh);
-      const y = pyTop + gh - bh;
+    if (v !== 0) {
+      const y = valueToY(v);
+      const top = Math.min(y, zeroY);
+      const bottom = Math.max(y, zeroY);
+      const drawBottom = bottom - top < 2 ? top + 2 : bottom;
+      const radius = Math.min(4, barW / 2, Math.max(1, (drawBottom - top) / 2));
+      const barColor = v < 0 ? lossCol : col;
 
       // 渐变柱子
-      const grad = c.createLinearGradient(x, y, x, pyTop + gh);
-      grad.addColorStop(0, col);
-      grad.addColorStop(1, col + '33');
+      const grad = c.createLinearGradient(x, top, x, bottom);
+      grad.addColorStop(0, v < 0 ? barColor + '33' : barColor);
+      grad.addColorStop(1, v < 0 ? barColor : barColor + '33');
       c.fillStyle = grad;
-      c.shadowColor = col; c.shadowBlur = 8;
+      c.shadowColor = barColor; c.shadowBlur = 8;
       c.beginPath();
-      c.moveTo(x + 4, y);
-      c.lineTo(x + barW - 4, y);
-      c.arcTo(x + barW, y, x + barW, y + 4, 4);
-      c.lineTo(x + barW, pyTop + gh);
-      c.lineTo(x, pyTop + gh);
-      c.lineTo(x, y + 4);
-      c.arcTo(x, y, x + 4, y, 4);
+      if (v > 0) {
+        c.moveTo(x + radius, top);
+        c.lineTo(x + barW - radius, top);
+        c.arcTo(x + barW, top, x + barW, top + radius, radius);
+        c.lineTo(x + barW, drawBottom);
+        c.lineTo(x, drawBottom);
+        c.lineTo(x, top + radius);
+        c.arcTo(x, top, x + radius, top, radius);
+      } else {
+        c.moveTo(x, top);
+        c.lineTo(x + barW, top);
+        c.lineTo(x + barW, drawBottom - radius);
+        c.arcTo(x + barW, drawBottom, x + barW - radius, drawBottom, radius);
+        c.lineTo(x + radius, drawBottom);
+        c.arcTo(x, drawBottom, x, drawBottom - radius, radius);
+        c.lineTo(x, top);
+      }
       c.closePath();
       c.fill();
       c.shadowColor = 'transparent'; c.shadowBlur = 0;
 
       // 金额标注在柱子顶部
-      if (range.buckets.length <= 12 || v === max) {
+      if (range.buckets.length <= 12 || v === max || v === min) {
         c.fillStyle = '#fff'; c.font = 'bold 11px -apple-system, "PingFang SC", sans-serif'; c.textAlign = 'center';
-        const labelY = y - 6 < pyTop + 10 ? y + 16 : y - 6;
-        c.fillText('¥' + fmtChartMoney(v), centerX, labelY);
+        const labelY = v > 0
+          ? (top - 6 < pyTop + 10 ? top + 16 : top - 6)
+          : (bottom + 14 > pyTop + gh ? bottom - 8 : bottom + 14);
+        c.fillText(fmtChartAmount(v), centerX, labelY);
       }
     }
 
