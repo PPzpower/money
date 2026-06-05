@@ -36,6 +36,10 @@ function renderTrack() {
   $('todayTotal').textContent = '¥'+day.reduce((s,e)=>s+e.amount,0).toFixed(2);
   $('todayCount').textContent = '共 '+day.length+' 笔';
   $('dateLabel').textContent = filterDate===today?'今天':filterDate===yest?'昨天':filterDate;
+  // 控制右箭头：今天或未来不能前进
+  const btn = $('nextDay');
+  if (filterDate >= today) { btn.disabled = true; btn.style.opacity = '0.3'; }
+  else { btn.disabled = false; btn.style.opacity = '1'; }
 
   if (!day.length) { $('entryList').innerHTML='<div class="empty">暂无记录，快去记一笔吧 ✍️</div>'; return; }
 
@@ -96,7 +100,18 @@ function del(id) {
   else { entries=entries.filter(e=>e.id!==id); save(); renderTrack(); renderStats(); }
 }
 
-function changeDate(d) { const dd=new Date(filterDate+'T00:00:00'); dd.setDate(dd.getDate()+d); filterDate=dStr(dd); renderTrack(); }
+function changeDate(d) {
+  const dd = new Date(filterDate + 'T00:00:00');
+  if (isNaN(dd.getTime())) { toast('日期错误'); return; }
+  dd.setDate(dd.getDate() + d);
+  // 限制不能超过今天
+  const today = dStr(new Date());
+  const newDate = dStr(dd);
+  if (newDate > today) { toast('不能超过今天'); return; }
+  if (newDate < '2020-01-01') { toast('日期太早了'); return; }
+  filterDate = newDate;
+  renderTrack();
+}
 
 // ====== 快捷备注模板 ======
 function renderTemplates() {
