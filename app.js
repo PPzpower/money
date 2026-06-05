@@ -311,7 +311,7 @@ function renderStats() {
   const c = ctx.getContext('2d');
   const w = Math.max(280, ctx.parentElement.clientWidth - 36);
   const h = 260;
-  const px = 32, pyTop = 30, pyBottom = 50;
+  const px = 32, pyTop = 46, pyBottom = 50;
   const gw = w - px - 12;
   const gh = h - pyTop - pyBottom;
 
@@ -371,7 +371,8 @@ function renderStats() {
       // 金额标注在柱子顶部
       if (range.buckets.length <= 12 || v === max) {
         c.fillStyle = '#fff'; c.font = 'bold 11px -apple-system, "PingFang SC", sans-serif'; c.textAlign = 'center';
-        c.fillText('¥' + fmtChartMoney(v), centerX, y - 6);
+        const labelY = y - 6 < pyTop + 10 ? y + 16 : y - 6;
+        c.fillText('¥' + fmtChartMoney(v), centerX, labelY);
       }
     }
 
