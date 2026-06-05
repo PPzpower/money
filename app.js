@@ -81,14 +81,13 @@ function closeSwipe(el) { el.classList.remove('swiped'); el.querySelector('.entr
 
 function add() {
   const v = parseFloat($('amountInput').value);
-  if (isNaN(v)||v<=0) { toast('请输入有效金额'); $('amountInput').focus(); return; }
+  if (isNaN(v)||v<=0) { toast('请输入有效金额'); return; }
   const note = $('noteInput').value.trim();
   entries.push({ id:genId(), amount:Math.round(v*100)/100, note, date:filterDate, timestamp:Date.now() });
   save();
   $('amountInput').value=''; $('noteInput').value='';
   renderTrack(); renderStats(); renderTemplates();
-  toast('已记录 ¥'+v.toFixed(2));
-  $('amountInput').focus();
+  // 记账后不再自动聚焦金额输入框
 }
 
 function del(id) {
@@ -108,7 +107,7 @@ function renderTemplates() {
     `<button class="note-tpl" data-note="${esc(n)}">${esc(n)}</button>`
   ).join('');
   tpl.querySelectorAll('.note-tpl').forEach(b=>{
-    b.addEventListener('click',()=>{ $('noteInput').value=b.dataset.note; $('amountInput').focus(); });
+    b.addEventListener('click',()=>{ $('noteInput').value=b.dataset.note; });
   });
 }
 
@@ -239,7 +238,7 @@ document.querySelectorAll('.nav-btn').forEach(b=>{ b.addEventListener('click',()
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   b.classList.add('active'); $(b.dataset.page).classList.add('active');
   if(b.dataset.page==='page-stats') renderStats();
-  else $('amountInput').focus();
+  // 切到记账页不自动聚焦
 });});
 
 // ====== 统计时间 Tab ======
@@ -261,10 +260,10 @@ $('prevDay').addEventListener('click',(e)=>{ e.stopPropagation(); changeDate(-1)
 $('nextDay').addEventListener('click',(e)=>{ e.stopPropagation(); changeDate(1); });
 QUICK_COINS.forEach(a=>{
   const b=document.createElement('button'); b.className='chip'; b.textContent='¥'+a; b.dataset.amount=a;
-  b.addEventListener('click',()=>{ $('amountInput').value=a; $('amountInput').focus(); });
+  b.addEventListener('click',()=>{ $('amountInput').value=a; });
   $('chips').appendChild(b);
 });
 
 // ====== 启动 ======
 load(); renderTrack(); renderStats(); renderTemplates();
-$('amountInput').focus();
+// 不再自动聚焦金额输入框
