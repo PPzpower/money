@@ -115,9 +115,12 @@ header { text-align: center; margin-bottom: 4px; }
 #addBtn:active { background: #c9304a; transform: scale(.96); }
 
 /* 快捷金额 */
-.chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
+.chips {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px; margin-top: 12px;
+}
 .chip {
-  padding: 7px 13px; background: #0f0f1a; border: 1px solid #2a2a4a;
+  min-width: 0; padding: 7px 0; background: #0f0f1a; border: 1px solid #2a2a4a;
   border-radius: 18px; font-size: 13px; color: #bbb; font-weight: 600;
   font-family: inherit; -webkit-appearance: none;
 }
@@ -139,6 +142,16 @@ header { text-align: center; margin-bottom: 4px; }
   pointer-events: auto;
 }
 #dateLabel { font-size: 15px; color: #eee; font-weight: 600; }
+
+.entries-card {
+  padding: 12px; margin-bottom: 10px; flex-shrink: 0;
+}
+.entries-head {
+  display: flex; justify-content: space-between; align-items: center;
+  color: #eee; font-size: 13px; font-weight: 800;
+  margin-bottom: 8px;
+}
+#entriesMeta { color: #666; font-size: 12px; font-weight: 600; }
 
 .calendar-card { padding: 12px; margin-bottom: 10px; flex-shrink: 0; }
 .calendar-head {
@@ -177,7 +190,9 @@ header { text-align: center; margin-bottom: 4px; }
 .calendar-day-amount.negative { color: #e94560; }
 .calendar-day-amount.neutral { color: #777; }
 
-.entry-list-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.entry-list-scroll {
+  max-height: 190px; overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
 .empty { text-align: center; color: #555; padding: 30px 10px; }
 
 .entry {
@@ -271,10 +286,14 @@ header { text-align: center; margin-bottom: 4px; }
   margin-bottom: 14px;
 }
 .stats-summary-row {
-  display: flex; justify-content: space-around; text-align: center;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px; text-align: center;
 }
-.stats-summary-row div { display: flex; flex-direction: column; }
-.stats-num { font-size: 22px; font-weight: 700; color: #00d2a0; }
+.stats-summary-row div { display: flex; flex-direction: column; min-width: 0; }
+.stats-num {
+  font-size: clamp(15px, 4.5vw, 22px); font-weight: 700; color: #00d2a0;
+  line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .stats-num.negative { color: #e94560; }
 .stats-num.neutral { color: #888; }
 .stats-label { font-size: 11px; color: #666; margin-top: 4px; }
@@ -290,13 +309,16 @@ header { text-align: center; margin-bottom: 4px; }
   font-weight: 700; margin-bottom: 12px;
 }
 .share-row {
-  display: grid; grid-template-columns: 52px 1fr 72px;
+  display: grid; grid-template-columns: 52px minmax(0, 1fr);
   gap: 8px; align-items: center; margin-bottom: 10px;
 }
 .share-name { font-size: 12px; color: #ddd; font-weight: 700; }
 .share-track { height: 8px; border-radius: 999px; background: #0f0f1a; overflow: hidden; }
 .share-fill { height: 100%; border-radius: 999px; background: #00d2a0; }
-.share-value { font-size: 12px; color: #888; text-align: right; white-space: nowrap; }
+.share-value {
+  grid-column: 2; font-size: 12px; color: #888;
+  text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .share-empty { text-align: center; color: #555; font-size: 13px; padding: 14px 0; }
 
 .data-actions {

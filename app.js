@@ -5,7 +5,7 @@
 
 // ====== 常量 ======
 const STORAGE_KEY = 'money_entries';
-const QUICK_COINS = ['10','50','100','200','500','1000'];
+const QUICK_COINS = ['50','100','200','500','1000'];
 const BASE_CATEGORIES = ['GPT','抢车','基金','闲置'];
 const UNCATEGORIZED = '未分类';
 const CATEGORIES = [...BASE_CATEGORIES, UNCATEGORIZED];
@@ -184,6 +184,7 @@ function renderTrack() {
   $('summaryLabel').textContent = todayLabel;
   setMoneyText('todayTotal', day.reduce((s,e)=>s+e.amount,0));
   $('todayCount').textContent = '共 '+day.length+' 笔';
+  $('entriesMeta').textContent = '共 '+day.length+' 笔';
   $('dateLabel').textContent = filterDate===today?'今天':filterDate===yest?'昨天':filterDate;
   $('dateLabel').style.cursor = 'pointer';
   $('dateLabel').onclick = () => { filterDate = today; syncCalendarToFilter(); renderTrack(); };
