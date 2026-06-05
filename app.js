@@ -150,38 +150,79 @@ function renderStats() {
   // 画图
   const ctx = $('chart');
   if (!ctx) return;
+  const dpr = window.devicePixelRatio || 1;
   const c = ctx.getContext('2d');
-  const w = ctx.parentElement.clientWidth-36, h=210, px=18, py=20, gw=w-36, gh=h-40;
-  ctx.width = w; ctx.height = h;
-  c.clearRect(0,0,w,h);
+  const w = ctx.parentElement.clientWidth - 36;
+  const h = 260;
+  const px = 20, pyTop = 30, pyBottom = 50;
+  const gw = w - px - 12;
+  const gh = h - pyTop - pyBottom;
 
-  // 网格线
-  c.strokeStyle='#1a1a3a'; c.lineWidth=1;
-  for (let i=0;i<=4;i++) { const y=py+gh*i/4; c.beginPath(); c.moveTo(px,y); c.lineTo(px+gw,y); c.stroke(); }
+  ctx.width = w * dpr; ctx.height = h * dpr;
+  ctx.style.width = w + 'px'; ctx.style.height = h + 'px';
+  c.scale(dpr, dpr);
+  c.clearRect(0, 0, w, h);
+
+  // 背景
+  c.fillStyle = '#0f0f1a22'; c.fillRect(px, pyTop, gw, gh);
+
+  // Y轴刻度标签 + 网格线
+  c.strokeStyle = '#1a1a3a'; c.lineWidth = 0.5;
+  c.fillStyle = '#555'; c.font = '11px -apple-system, "PingFang SC", sans-serif'; c.textAlign = 'right';
+  const maxVal = max || 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pyTop + gh * i / 4;
+    const val = Math.round(maxVal * (4 - i) / 4);
+    c.beginPath(); c.moveTo(px, y); c.lineTo(px + gw, y); c.stroke();
+    c.fillText('¥' + val, px - 6, y + 4);
+  }
 
   // 柱子
-  const barW = Math.max(4, gw/labels.length*0.6), gap = gw/labels.length;
-  const maxVal = max||1;
-  data.forEach((v,i)=>{
-    const bh = v/maxVal*gh;
-    const x = px+i*gap+(gap-barW)/2, y = py+gh-bh;
-    const grad=c.createLinearGradient(x,y,x,py+gh);
-    if (statCategory==='all') { grad.addColorStop(0,'#00d2a0'); grad.addColorStop(1,'rgba(0,210,160,.15)'); }
-    else if (statCategory==='GPT') { grad.addColorStop(0,'#10b981'); grad.addColorStop(1,'rgba(16,185,129,.15)'); }
-    else if (statCategory==='抢车') { grad.addColorStop(0,'#3b82f6'); grad.addColorStop(1,'rgba(59,130,246,.15)'); }
-    else if (statCategory==='基金') { grad.addColorStop(0,'#f59e0b'); grad.addColorStop(1,'rgba(245,158,11,.15)'); }
-    else { grad.addColorStop(0,'#8b5cf6'); grad.addColorStop(1,'rgba(139,92,246,.15)'); }
-    c.fillStyle=grad;
-    c.beginPath(); c.roundRect(x,y,barW,bh,[3]); c.fill();
-    // 金额标注
-    if (v>0) { c.fillStyle='#ccc'; c.font='bold 9px system-ui'; c.textAlign='center'; c.fillText('¥'+v, px+i*gap+gap/2, y-4); }
+  const barW = Math.max(6, gw / labels.length * 0.52), gap = gw / labels.length;
+  const categoryColors = {
+    all: '#00d2a0', GPT: '#10b981', '抢车': '#3b82f6', '基金': '#f59e0b', '闲置': '#8b5cf6'
+  };
+  const col = categoryColors[statCategory] || '#00d2a0';
+
+  data.forEach((v, i) => {
+    if (v <= 0) return;
+    const bh = Math.max(2, v / maxVal * gh);
+    const x = px + i * gap + (gap - barW) / 2;
+    const y = pyTop + gh - bh;
+
+    // 渐变柱子
+    const grad = c.createLinearGradient(x, y, x, pyTop + gh);
+    grad.addColorStop(0, col);
+    grad.addColorStop(1, col + '33');
+    c.fillStyle = grad;
+    c.shadowColor = col; c.shadowBlur = 8;
+    c.beginPath();
+    c.moveTo(x + 4, y);
+    c.lineTo(x + barW - 4, y);
+    c.arcTo(x + barW, y, x + barW, y + 4, 4);
+    c.lineTo(x + barW, pyTop + gh);
+    c.lineTo(x, pyTop + gh);
+    c.lineTo(x, y + 4);
+    c.arcTo(x, y, x + 4, y, 4);
+    c.closePath();
+    c.fill();
+    c.shadowColor = 'transparent'; c.shadowBlur = 0;
+
+    // 金额标注在柱子顶部
+    c.fillStyle = '#fff'; c.font = 'bold 11px -apple-system, "PingFang SC", sans-serif'; c.textAlign = 'center';
+    c.fillText('¥' + v, px + i * gap + gap / 2, y - 6);
+
     // 底部标签
-    if (labels.length<=31) {
-      c.fillStyle='#666'; c.font='10px system-ui'; c.textAlign='center';
-      const lbl = statMode==='week'?['日','一','二','三','四','五','六'][new Date(labels[i]+'T00:00:00').getDay()]:labels[i];
-      c.fillText(lbl, px+i*gap+gap/2, py+gh+14);
+    if (labels.length <= 31) {
+      c.fillStyle = '#777'; c.font = '11px -apple-system, "PingFang SC", sans-serif'; c.textAlign = 'center';
+      const lbl = statMode === 'week' ? ['日', '一', '二', '三', '四', '五', '六'][new Date(labels[i] + 'T00:00:00').getDay()] : labels[i];
+      c.fillText(lbl, px + i * gap + gap / 2, pyTop + gh + 18);
     }
   });
+
+  // 顶部标题
+  c.fillStyle = '#888'; c.font = 'bold 13px -apple-system, "PingFang SC", sans-serif'; c.textAlign = 'center';
+  c.fillText((statCategory === 'all' ? '全部' : statCategory) + ' · ' + (statMode === 'week' ? '本周' : statMode === 'month' ? '本月' : '全年'), px + gw / 2, 16);
 }
 
 // ====== Toast ======
