@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body ontouchmove="event.preventDefault()">
+<body>
 
   <!-- 三个页面，用 display 切换 -->
   <div id="page-track" class="page active">
@@ -41,7 +41,7 @@
       <span id="dateLabel">今天</span>
       <button id="nextDay">›</button>
     </div>
-    <div id="entryList" class="entry-list"></div>
+    <div id="entryList" class="entry-list-scroll"></div>
   </div>
 
   <!-- ====== 统计页 ====== -->

@@ -110,16 +110,43 @@ header { text-align: center; margin-bottom: 4px; }
 }
 #dateLabel { font-size: 15px; color: #eee; font-weight: 600; }
 
-.entry-list { flex: 1; overflow-y: auto; }
+.entry-list-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .empty { text-align: center; color: #555; padding: 30px 10px; }
 
 .entry {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center;
   background: #1a1a2e; border: 1px solid #2a2a4a;
-  border-radius: 10px; padding: 12px; margin-bottom: 6px;
-  animation: slideIn .2s ease-out;
+  border-radius: 10px; margin-bottom: 6px;
+  position: relative; overflow: hidden;
+  animation: slideDown .3s ease-out;
 }
-@keyframes slideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* 滑动容器 */
+.entry-inner {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px;
+  width: 100%; min-width: 0;
+  transition: transform .25s ease;
+  background: #1a1a2e; position: relative; z-index: 1;
+}
+/* 删除背景层 */
+.entry-delete-bg {
+  position: absolute; right: 0; top: 0; height: 100%;
+  width: 80px;
+  background: #e94560; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 600;
+  border-radius: 0 10px 10px 0;
+}
+.entry.swiped .entry-inner { transform: translateX(-80px); }
+
+/* 按住删除 */
+.entry.removing {
+  opacity: 0; height: 0; padding: 0; margin: 0;
+  overflow: hidden;
+  transition: all .3s ease;
+}
 
 .entry-body { flex: 1; min-width: 0; }
 .entry-note { font-size: 14px; color: #ddd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -165,6 +192,17 @@ nav {
 }
 .nav-btn.active { color: #e94560; }
 .nav-btn svg { width: 22px; height: 22px; }
+
+/* ====== 快捷备注模板 ====== */
+.note-templates {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+}
+.note-tpl {
+  padding: 5px 10px; background: rgba(233,69,96,.1); border: 1px solid rgba(233,69,96,.2);
+  border-radius: 14px; font-size: 11px; color: #e94560;
+  font-family: inherit; -webkit-appearance: none; white-space: nowrap;
+}
+.note-tpl:active { background: #e94560; color: #fff; }
 
 /* ====== Toast ====== */
 #toast {
