@@ -230,6 +230,14 @@ header { text-align: center; margin-bottom: 4px; }
   overflow-x: auto; -webkit-overflow-scrolling: touch;
   padding-bottom: 4px;
 }
+#page-stats .category-filter {
+  position: sticky;
+  top: max(88px, calc(12px + env(safe-area-inset-top, 44px)));
+  z-index: 60;
+  background: #0f0f1a;
+  padding-top: 8px;
+  margin-top: -8px;
+}
 .cat-btn {
   padding: 8px 16px; border-radius: 18px; border: 1px solid #2a2a4a;
   background: #1a1a2e; color: #888; font-size: 13px; font-weight: 600;
