@@ -29,9 +29,12 @@ function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }
 // ====== 渲染记账页 ======
 function renderTrack() {
   const day = entries.filter(e=>e.date===filterDate).sort((a,b)=>b.timestamp-a.timestamp);
+  const today=dStr(new Date()), yest=dStr(new Date(Date.now()-86400000));
+  // 顶部汇总卡片标题跟随实际日期
+  const todayLabel = filterDate===today?'今日收入':filterDate===yest?'昨日收入':filterDate+' 收入';
+  $('summaryLabel').textContent = todayLabel;
   $('todayTotal').textContent = '¥'+day.reduce((s,e)=>s+e.amount,0).toFixed(2);
   $('todayCount').textContent = '共 '+day.length+' 笔';
-  const today=dStr(new Date()), yest=dStr(new Date(Date.now()-86400000));
   $('dateLabel').textContent = filterDate===today?'今天':filterDate===yest?'昨天':filterDate;
 
   if (!day.length) { $('entryList').innerHTML='<div class="empty">暂无记录，快去记一笔吧 ✍️</div>'; return; }
