@@ -257,8 +257,8 @@ document.querySelectorAll('.cat-btn').forEach(b=>{ b.addEventListener('click',()
 // ====== 事件 ======
 $('addBtn').addEventListener('click',add);
 $('amountInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();add();} });
-$('prevDay').addEventListener('click',()=>changeDate(-1));
-$('nextDay').addEventListener('click',()=>changeDate(1));
+$('prevDay').addEventListener('click',(e)=>{ e.stopPropagation(); changeDate(-1); });
+$('nextDay').addEventListener('click',(e)=>{ e.stopPropagation(); changeDate(1); });
 QUICK_COINS.forEach(a=>{
   const b=document.createElement('button'); b.className='chip'; b.textContent='¥'+a; b.dataset.amount=a;
   b.addEventListener('click',()=>{ $('amountInput').value=a; $('amountInput').focus(); });
