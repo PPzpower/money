@@ -72,6 +72,7 @@ let entries = [];
 let statMode = 'week';
 let statCategory = 'all'; // 'all' | 'GPT' | '抢车' | '基金' | '闲置'
 let statAnchorDate = todayStr();
+let amountSign = 1;
 let swipedEntry = null;
 
 // ====== 数据读写 ======
@@ -161,14 +162,30 @@ function renderTrack() {
 
 function closeSwipe(el) { el.classList.remove('swiped'); el.querySelector('.entry-inner').style.transform='translateX(0)'; swipedEntry=null; }
 
+function renderAmountSign() {
+  const btn = $('signToggle');
+  btn.classList.toggle('active', amountSign < 0);
+  btn.setAttribute('aria-pressed', amountSign < 0 ? 'true' : 'false');
+  btn.textContent = amountSign < 0 ? '−' : '±';
+}
+
+function toggleAmountSign() {
+  amountSign *= -1;
+  renderAmountSign();
+  $('amountInput').focus();
+}
+
 function add() {
   const rawAmount = $('amountInput').value.trim();
-  const v = Number(rawAmount);
+  const typedAmount = Number(rawAmount);
+  const hasTypedSign = /^[+-]/.test(rawAmount);
+  const v = hasTypedSign ? typedAmount : typedAmount * amountSign;
   if (!Number.isFinite(v)||v===0) { toast('请输入非 0 金额'); return; }
   const note = $('noteInput').value.trim();
   entries.push({ id:genId(), amount:Math.round(v*100)/100, note, date:filterDate, timestamp:Date.now() });
   save();
   $('amountInput').value=''; $('noteInput').value='';
+  amountSign = 1; renderAmountSign();
   renderTrack(); renderStats(); renderTemplates();
   // 记账后不再自动聚焦金额输入框
 }
@@ -474,6 +491,7 @@ document.querySelectorAll('.cat-btn').forEach(b=>{ b.addEventListener('click',()
 
 // ====== 事件 ======
 $('addBtn').addEventListener('click',add);
+$('signToggle').addEventListener('click',toggleAmountSign);
 $('amountInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();add();} });
 $('prevDay').addEventListener('click',(e)=>{ e.stopPropagation(); changeDate(-1); });
 $('nextDay').addEventListener('click',(e)=>{ e.stopPropagation(); changeDate(1); });
@@ -487,5 +505,5 @@ QUICK_COINS.forEach(a=>{
 });
 
 // ====== 启动 ======
-load(); renderTrack(); renderStats(); renderTemplates();
+load(); renderAmountSign(); renderTrack(); renderStats(); renderTemplates();
 // 不再自动聚焦金额输入框
