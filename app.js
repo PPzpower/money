@@ -133,6 +133,7 @@ function renderStats() {
   // 分类过滤
   const inRange = entries.filter(e=>e.date>=dStr(start)&&e.date<=dStr(now));
   const filtered = statCategory==='all' ? inRange : inRange.filter(e=>e.note===statCategory);
+  console.log('DEBUG stats:', {statMode, statCategory, start:dStr(start), now:dStr(now), totalEntries:entries.length, inRange:inRange.length, filtered:filtered.length, labels, data:labels.map(l=>filtered.filter(e=>keyFn(e)===l).reduce((s,e)=>s+e.amount,0))});
 
   const data = labels.map(l=>filtered.filter(e=>keyFn(e)===l).reduce((s,e)=>s+e.amount,0));
   const total = data.reduce((a,b)=>a+b,0);
