@@ -740,7 +740,9 @@ document.querySelectorAll('.nav-btn').forEach(b=>{ b.addEventListener('click',()
   document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');
-  $(b.dataset.page).classList.add('active');
+  const page = $(b.dataset.page);
+  page.classList.add('active');
+  page.scrollTop = 0;
   if(b.dataset.page==='page-stats') renderStats();
 });});
 
