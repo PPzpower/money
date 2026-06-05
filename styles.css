@@ -1,0 +1,254 @@
+/* ====== 基础 ====== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  height: 100%;
+  background: #0f0f1a;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  color: #eee;
+  background: #0f0f1a;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 24px 16px calc(30px + env(safe-area-inset-bottom));
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* ====== 头部 ====== */
+header {
+  text-align: center;
+  margin-bottom: 4px;
+}
+header h1 {
+  font-size: 26px;
+  letter-spacing: 2px;
+}
+.tagline {
+  color: #666;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* ====== 卡片 ====== */
+.card {
+  background: #1a1a2e;
+  border-radius: 18px;
+  border: 1px solid #2a2a4a;
+}
+
+/* ====== 今日汇总 ====== */
+.summary {
+  margin-top: 18px;
+  padding: 28px 20px;
+  text-align: center;
+}
+.summary-label {
+  font-size: 12px;
+  color: #888;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.summary-amount {
+  font-size: 50px;
+  font-weight: 800;
+  color: #00d2a0;
+  margin: 10px 0;
+}
+.summary-count {
+  font-size: 13px;
+  color: #666;
+}
+
+/* ====== 输入区 ====== */
+.input-area { margin-top: 16px; padding: 20px; }
+
+.amount-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.yuan {
+  font-size: 34px;
+  font-weight: 700;
+  color: #e94560;
+}
+
+#amountInput {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid #2a2a4a;
+  font-size: 34px;
+  font-weight: 700;
+  color: #fff;
+  padding: 6px 4px;
+  outline: none;
+  font-family: inherit;
+}
+#amountInput:focus { border-bottom-color: #e94560; }
+#amountInput::placeholder { color: #444; }
+
+#noteInput {
+  width: 100%;
+  background: #0f0f1a;
+  border: 1px solid #2a2a4a;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #eee;
+  padding: 12px 14px;
+  outline: none;
+  margin-bottom: 14px;
+  font-family: inherit;
+}
+#noteInput:focus { border-color: #e94560; }
+#noteInput::placeholder { color: #555; }
+
+#addBtn {
+  width: 100%;
+  padding: 15px;
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  font-family: inherit;
+  -webkit-appearance: none;
+  transition: background .15s, transform .1s;
+}
+#addBtn:active { background: #c9304a; transform: scale(.97); }
+
+/* 快捷金额 */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+}
+.chip {
+  padding: 8px 15px;
+  background: #0f0f1a;
+  border: 1px solid #2a2a4a;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #bbb;
+  font-weight: 600;
+  font-family: inherit;
+  -webkit-appearance: none;
+  white-space: nowrap;
+}
+.chip:active { background: #e94560; color: #fff; border-color: #e94560; }
+
+/* ====== 记录区域 ====== */
+.history { margin-top: 22px; }
+.history-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+.history-bar button {
+  background: none;
+  border: none;
+  color: #e94560;
+  font-size: 15px;
+  padding: 6px 10px;
+  font-family: inherit;
+  -webkit-appearance: none;
+}
+#dateLabel { font-size: 16px; color: #eee; font-weight: 600; }
+
+#entryList { list-style: none; }
+.empty {
+  text-align: center;
+  color: #555;
+  padding: 40px 10px;
+}
+
+/* 单条记录 */
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #1a1a2e;
+  border: 1px solid #2a2a4a;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 8px;
+  animation: slideIn .25s ease-out;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.entry.removing {
+  transform: translateX(110%);
+  opacity: 0;
+  transition: all .25s;
+}
+
+.entry-amount {
+  font-size: 19px;
+  font-weight: 700;
+  color: #00d2a0;
+  white-space: nowrap;
+}
+.entry-body {
+  flex: 1;
+  min-width: 0;
+}
+.entry-note {
+  font-size: 15px;
+  color: #ddd;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.entry-time {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+.entry-del {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 20px;
+  padding: 6px 8px;
+  -webkit-appearance: none;
+}
+.entry-del:active { color: #e94560; }
+
+/* ====== Toast ====== */
+#toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #2a2a4a;
+  color: #eee;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all .3s;
+  border: 1px solid #3a3a5a;
+  z-index: 99;
+  white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* 去掉数字框箭头 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }

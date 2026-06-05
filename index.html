@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <!-- Apple 主屏幕 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="副业记账">
+  <meta name="theme-color" content="#0f0f1a">
+  <title>副业记账</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 顶部 -->
+  <header>
+    <h1>💰 副业记账</h1>
+    <p class="tagline">每一笔努力，都值得被记住</p>
+  </header>
+
+  <!-- 今日汇总 -->
+  <div class="card summary">
+    <div class="summary-label">今日收入</div>
+    <div class="summary-amount" id="todayTotal">¥0.00</div>
+    <div class="summary-count" id="todayCount">共 0 笔</div>
+  </div>
+
+  <!-- 记账区域 -->
+  <div class="card input-area">
+    <div class="amount-row">
+      <span class="yuan">¥</span>
+      <input type="number" id="amountInput" placeholder="0.00" inputmode="decimal" step="0.01" min="0.01">
+    </div>
+    <input type="text" id="noteInput" placeholder="备注（选填）" maxlength="50">
+    <button id="addBtn">记一笔</button>
+
+    <!-- 快捷金额 -->
+    <div class="chips">
+      <button class="chip" data-amount="10">¥10</button>
+      <button class="chip" data-amount="50">¥50</button>
+      <button class="chip" data-amount="100">¥100</button>
+      <button class="chip" data-amount="200">¥200</button>
+      <button class="chip" data-amount="500">¥500</button>
+      <button class="chip" data-amount="1000">¥1000</button>
+    </div>
+  </div>
+
+  <!-- 记录列表 -->
+  <div class="history">
+    <div class="history-bar">
+      <button id="prevDay">‹ 前一天</button>
+      <span id="dateLabel">今天</span>
+      <button id="nextDay">后一天 ›</button>
+    </div>
+    <ul id="entryList">
+      <li class="empty">暂无记录，快去记一笔吧 ✍️</li>
+    </ul>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
