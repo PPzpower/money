@@ -222,11 +222,13 @@ nav {
 
 /* ====== 快捷备注模板 ====== */
 .note-templates {
-  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin: 12px 0 16px;
+  padding-bottom: 4px;
 }
 .note-tpl {
-  padding: 5px 10px; background: rgba(233,69,96,.1); border: 1px solid rgba(233,69,96,.2);
-  border-radius: 14px; font-size: 11px; color: #e94560;
+  padding: 8px 14px; background: rgba(233,69,96,.1); border: 1px solid rgba(233,69,96,.25);
+  border-radius: 16px; font-size: 13px; color: #e94560;
   font-family: inherit; -webkit-appearance: none; white-space: nowrap;
 }
 .note-tpl:active { background: #e94560; color: #fff; }
