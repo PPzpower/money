@@ -36,6 +36,9 @@ function renderTrack() {
   $('todayTotal').textContent = '¥'+day.reduce((s,e)=>s+e.amount,0).toFixed(2);
   $('todayCount').textContent = '共 '+day.length+' 笔';
   $('dateLabel').textContent = filterDate===today?'今天':filterDate===yest?'昨天':filterDate;
+  // 点击日期标签回到今天
+  $('dateLabel').style.cursor = 'pointer';
+  $('dateLabel').onclick = () => { filterDate = today; renderTrack(); };
   // 控制右箭头：今天或未来不能前进
   const btn = $('nextDay');
   if (filterDate >= today) { btn.disabled = true; btn.style.opacity = '0.3'; }
@@ -148,8 +151,6 @@ function renderStats() {
   // 分类过滤
   const inRange = entries.filter(e=>e.date>=dStr(start)&&e.date<=dStr(now));
   const filtered = statCategory==='all' ? inRange : inRange.filter(e=>e.note===statCategory);
-  console.log('DEBUG stats:', {statMode, statCategory, start:dStr(start), now:dStr(now), totalEntries:entries.length, inRange:inRange.length, filtered:filtered.length, labels, data:labels.map(l=>filtered.filter(e=>keyFn(e)===l).reduce((s,e)=>s+e.amount,0))});
-
   const data = labels.map(l=>filtered.filter(e=>keyFn(e)===l).reduce((s,e)=>s+e.amount,0));
   const total = data.reduce((a,b)=>a+b,0);
   const ct = filtered.length;
