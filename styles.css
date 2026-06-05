@@ -34,10 +34,10 @@ body {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   padding: 12px 16px 16px;
-  padding-top: max(64px, calc(8px + env(safe-area-inset-top, 32px)));
+  padding-top: calc(16px + env(safe-area-inset-top));
 }
 .page.active { display: flex; flex-direction: column; }
-#page-stats { padding-top: max(112px, calc(32px + env(safe-area-inset-top, 44px))); }
+#page-stats { padding-top: calc(16px + env(safe-area-inset-top)); }
 
 /* ====== 头部 ====== */
 header { text-align: center; margin-bottom: 4px; }
@@ -227,11 +227,13 @@ header { text-align: center; margin-bottom: 4px; }
 
 /* ====== 分类筛选 ====== */
 .category-filter {
-  display: flex; gap: 6px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px; margin-bottom: 12px;
+  min-height: 48px; flex-shrink: 0;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
   padding-bottom: 4px;
 }
 .cat-btn {
+  min-height: 40px; display: flex; align-items: center; justify-content: center;
   padding: 8px 16px; border-radius: 18px; border: 1px solid #2a2a4a;
   background: #1a1a2e; color: #888; font-size: 13px; font-weight: 600;
   font-family: inherit; -webkit-appearance: none; white-space: nowrap;
