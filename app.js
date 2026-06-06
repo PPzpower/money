@@ -698,7 +698,7 @@ function renderChart(range, data, max, min, catName) {
       }
     }
 
-    const shouldShowLabel = (statMode !== 'month' && statMode !== 'custom') || i === 0 || i === range.buckets.length - 1 || (i + 1) % 5 === 0;
+    const shouldShowLabel = (statMode !== 'month' && statMode !== 'custom') || i === 0 || (i + 1) % 5 === 0;
     if (shouldShowLabel) {
       c.fillStyle = '#777'; c.font = '11px -apple-system, "PingFang SC", sans-serif'; c.textAlign = 'center';
       c.fillText(range.buckets[i].label, centerX, pyTop + gh + 18);
