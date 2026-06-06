@@ -1,5 +1,5 @@
 // Service Worker - 让 App 离线也能用
-const CACHE_NAME = 'money-app-v10';
+const CACHE_NAME = 'money-app-v11';
 const FILES = [
   './index.html',
   './styles.css',
