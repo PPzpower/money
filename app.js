@@ -110,6 +110,8 @@ let entries = [];
 let statMode = 'week';
 let statCategory = 'all';
 let statAnchorDate = todayStr();
+let customStatYear = new Date().getFullYear();
+let customStatMonth = new Date().getMonth() + 1;
 let amountSign = 1;
 let selectedCategory = BASE_CATEGORIES[0];
 let editEntryId = null;
@@ -431,31 +433,83 @@ function deleteEdit() {
 function startOfWeek(d) {
   return addDays(d, -((d.getDay() + 6) % 7));
 }
-function isSamePeriod(a, b, mode) {
+function isSamePeriod(a, b, mode, customY, customM) {
   if (mode === 'week') return dStr(startOfWeek(a)) === dStr(startOfWeek(b));
   if (mode === 'month') return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
+  if (mode === 'custom') return a.getFullYear() === customY && a.getMonth() === (customM - 1);
   return a.getFullYear() === b.getFullYear();
 }
-function shiftDateByMode(d, mode, step) {
+function shiftDateByMode(d, mode, step, customY, customM) {
   if (mode === 'week') return addDays(d, step * 7);
   if (mode === 'month') return new Date(d.getFullYear(), d.getMonth() + step, 1);
+  if (mode === 'custom') {
+    const m = customM - 1 + step;
+    return new Date(customY + Math.floor(m / 12), ((m % 12) + 12) % 12, 1);
+  }
   return new Date(d.getFullYear() + step, 0, 1);
 }
-function periodEndFor(d, mode) {
+function periodEndFor(d, mode, customY, customM) {
   if (mode === 'week') return addDays(startOfWeek(d), 6);
   if (mode === 'month') return new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  if (mode === 'custom') return new Date(customY, customM, 0);
   return new Date(d.getFullYear(), 11, 31);
 }
 function periodLabel(range) {
   const y = range.start.getFullYear();
-  if (range.isCurrent) return statMode === 'week' ? '本周' : statMode === 'month' ? '本月' : '今年';
+  if (range.isCurrent) return statMode === 'week' ? '本周' : statMode === 'month' ? '本月' : statMode === 'custom' ? `${customStatYear}年${customStatMonth}月` : '今年';
   if (statMode === 'week') {
     const start = fmtYMD(range.start);
     const end = range.naturalEnd.getFullYear() === y ? fmtMD(range.naturalEnd) : fmtYMD(range.naturalEnd);
     return `${start}-${end}`;
   }
   if (statMode === 'month') return `${y}年${range.start.getMonth()+1}月`;
+  if (statMode === 'custom') return `${customStatYear}年${customStatMonth}月`;
   return `${y}年`;
+}
+function populateCustomPeriodPicker() {
+  const yearSel = document.getElementById('customYearSelect');
+  const monthSel = document.getElementById('customMonthSelect');
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+  
+  // Populate years from MIN_DATE year to current year
+  const minYear = parseInt(MIN_DATE, 10);
+  yearSel.innerHTML = '';
+  for (let y = currentYear; y >= minYear; y--) {
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y + '\u5e74';
+    yearSel.appendChild(opt);
+  }
+  
+  // Populate months 1-12
+  monthSel.innerHTML = '';
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = m + '\u6708';
+    // Disable months in the current year that are in the future
+    if (customStatYear === currentYear && m > currentMonth) {
+      opt.disabled = true;
+    }
+    monthSel.appendChild(opt);
+  }
+  
+  yearSel.value = customStatYear;
+  monthSel.value = customStatMonth;
+  
+  // Remove old listeners by cloning
+  yearSel.onchange = function() {
+    customStatYear = parseInt(this.value, 10);
+    // Re-populate months to update disabled state
+    populateCustomPeriodPicker();
+    renderStats();
+  };
+  monthSel.onchange = function() {
+    customStatMonth = parseInt(this.value, 10);
+    renderStats();
+  };
 }
 function getStatsRange() {
   const today = parseLocalDate(todayStr());
@@ -480,6 +534,17 @@ function getStatsRange() {
       return { key: dStr(d), label: String(i + 1) };
     });
     keyFn = e => e.date;
+  } else if (statMode === 'custom') {
+    const cy = customStatYear, cm = customStatMonth;
+    start = new Date(cy, cm - 1, 1);
+    naturalEnd = new Date(cy, cm, 0);
+    const daysInMonth = naturalEnd.getDate();
+    buckets = Array.from({length: daysInMonth}, (_, i) => {
+      const d = new Date(cy, cm - 1, i + 1);
+      return { key: dStr(d), label: String(i + 1) };
+    });
+    keyFn = e => e.date;
+    anchor = start;
   } else {
     start = new Date(anchor.getFullYear(), 0, 1);
     naturalEnd = new Date(anchor.getFullYear(), 11, 31);
@@ -493,9 +558,9 @@ function getStatsRange() {
   start.setHours(0,0,0,0);
   naturalEnd.setHours(0,0,0,0);
   const end = naturalEnd > today ? today : naturalEnd;
-  const isCurrent = isSamePeriod(anchor, today, statMode);
-  const nextStart = shiftDateByMode(start, statMode, 1);
-  const prevEnd = periodEndFor(shiftDateByMode(start, statMode, -1), statMode);
+  const isCurrent = isSamePeriod(anchor, today, statMode, customStatYear, customStatMonth);
+  const nextStart = shiftDateByMode(start, statMode, 1, customStatYear, customStatMonth);
+  const prevEnd = periodEndFor(shiftDateByMode(start, statMode, -1, customStatYear, customStatMonth), statMode, customStatYear, customStatMonth);
 
   return {
     start,
@@ -668,9 +733,24 @@ function renderCategoryShare(inRange) {
   }).join('');
 }
 function changeStatPeriod(step) {
+  const today = parseLocalDate(todayStr());
+  if (statMode === 'custom') {
+    let newM = customStatMonth + step;
+    let newY = customStatYear;
+    if (newM < 1) { newM = 12; newY -= 1; }
+    else if (newM > 12) { newM = 1; newY += 1; }
+    const endOfNew = new Date(newY, newM, 0);
+    if (endOfNew > today) { toast('不能超过今天'); return; }
+    if (newY < 2020 || (newY === 2020 && newM < 1)) { toast('日期太早了'); return; }
+    customStatYear = newY;
+    customStatMonth = newM;
+    $('customYearSelect').value = newY;
+    $('customMonthSelect').value = newM;
+    renderStats();
+    return;
+  }
   const anchor = parseLocalDate(statAnchorDate) || parseLocalDate(todayStr());
   const next = shiftDateByMode(anchor, statMode, step);
-  const today = parseLocalDate(todayStr());
   const nextEnd = periodEndFor(next, statMode);
   if (next > today) { toast('不能超过今天'); return; }
   if (dStr(nextEnd) < MIN_DATE) { toast('日期太早了'); return; }
@@ -752,6 +832,18 @@ document.querySelectorAll('.stat-tab').forEach(b=>{ b.addEventListener('click',(
   document.querySelectorAll('.stat-tab').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');
   statMode=b.dataset.mode;
+  const picker = $('customPeriodPicker');
+  if (statMode === 'custom') {
+    picker.classList.remove('hidden');
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+    if (!customStatYear || customStatYear > currentYear) customStatYear = currentYear;
+    if (!customStatMonth || (customStatYear === currentYear && customStatMonth > currentMonth)) customStatMonth = currentMonth;
+    populateCustomPeriodPicker();
+  } else {
+    picker.classList.add('hidden');
+  }
   renderStats();
 });});
 document.querySelectorAll('.cat-btn').forEach(b=>{ b.addEventListener('click',()=>{

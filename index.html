@@ -77,8 +77,15 @@
       <button class="stat-tab active" data-mode="week">本周</button>
       <button class="stat-tab" data-mode="month">本月</button>
       <button class="stat-tab" data-mode="year">全年</button>
+      <button class="stat-tab" data-mode="custom">自定义</button>
     </div>
 
+    <div id="customPeriodPicker" class="custom-period-picker hidden">
+      <select id="customYearSelect" class="period-select"></select>
+      <span class="period-sep">年</span>
+      <select id="customMonthSelect" class="period-select"></select>
+      <span class="period-sep">月</span>
+    </div>
     <div class="stats-period">
       <button id="prevPeriod" aria-label="上一周期">‹</button>
       <span id="periodLabel">本周</span>
